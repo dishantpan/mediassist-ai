@@ -1,170 +1,978 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MediAssist — Select Symptoms</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background: #f0f4ff; }
-        .navbar { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .symptom-card { border-radius: 15px; border: 2px solid #e0e0e0; transition: all 0.2s; cursor: pointer; }
-        .symptom-card:hover { border-color: #667eea; background: #f0f0ff; }
-        .symptom-card input:checked ~ .card-body { background: #667eea22; }
-        .section-title { color: #667eea; font-weight: 700; border-left: 4px solid #667eea; padding-left: 10px; }
-        .btn-submit { background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 12px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MediAssist AI — Select your symptoms and get instant AI-powered department recommendations for optimal hospital routing.">
+  <title>MediAssist AI — Symptom Analysis</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="css/mediassist.css" rel="stylesheet">
+  <style>
+    body { background: var(--bg-dark); color: var(--text-primary); font-family: 'Inter', sans-serif; }
+
+    /* ── Hero Section ── */
+    .symptoms-hero {
+      padding: 48px 0 36px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.12);
+      border: 1px solid rgba(14,165,233,0.25);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .symptoms-hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      letter-spacing: -0.03em;
+    }
+    .symptoms-hero p { color: var(--text-secondary); font-size: 1.05rem; max-width: 560px; margin: 0 auto 30px; }
+
+    /* ── Search Bar ── */
+    .symptom-search-wrap {
+      max-width: 560px;
+      margin: 0 auto 36px;
+      position: relative;
+    }
+    .symptom-search {
+      width: 100%;
+      padding: 16px 52px 16px 52px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 999px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      outline: none;
+    }
+    .symptom-search:focus {
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.15), 0 8px 32px rgba(148,163,184,0.1);
+    }
+    .symptom-search::placeholder { color: var(--text-muted); }
+    .search-icon-left {
+      position: absolute; left: 18px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted); font-size: 0.9rem;
+    }
+    .search-clear {
+      position: absolute; right: 18px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+      display: none; transition: var(--transition-fast);
+    }
+    .search-clear:hover { color: var(--primary-light); }
+    .symptom-count-badge {
+      position: absolute; right: 18px; top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: white; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; min-width: 24px; text-align: center;
+    }
+
+    /* ── Category Pills ── */
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 36px;
+      scrollbar-width: none;
+    }
+    .category-pills::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .cat-pill:hover { border-color: var(--primary); color: var(--primary-dark); background: rgba(14,165,233,0.06); }
+    .cat-pill.active { background: linear-gradient(135deg, var(--primary), var(--teal)); border-color: transparent; color: white; box-shadow: 0 4px 15px rgba(14,165,233,0.25); }
+
+    /* ── Emergency Banner ── */
+    #emergency-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.1));
+      border: 1px solid rgba(239,68,68,0.4);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      align-items: flex-start;
+      gap: 16px;
+      animation: emergencySlide 0.4s ease;
+    }
+    #emergency-banner.show { display: flex; }
+    @keyframes emergencySlide { from { opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);} }
+    .emergency-icon-wrap {
+      width: 44px; height: 44px;
+      background: rgba(239,68,68,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      animation: emergencyPulseIcon 1.5s ease-in-out infinite;
+    }
+    @keyframes emergencyPulseIcon {
+      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    }
+    .emergency-severity {
+      display: flex; gap: 4px; margin-top: 8px;
+    }
+    .sev-dot {
+      width: 24px; height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.15);
+    }
+    .sev-dot.active { background: var(--emergency); }
+
+    /* ── Section Headers ── */
+    .category-section { margin-bottom: 36px; }
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .category-header:hover { background: rgba(14,165,233,0.06); border-color: rgba(14,165,233,0.2); }
+    .cat-icon-box {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .category-header .cat-title { font-weight: 700; font-size: 1rem; flex: 1; }
+    .category-header .cat-count {
+      font-size: 0.75rem; color: var(--text-muted);
+      background: rgba(255,255,255,0.07);
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .category-header .cat-chevron {
+      color: var(--text-muted); transition: transform 0.3s ease;
+    }
+    .category-header.collapsed .cat-chevron { transform: rotate(-90deg); }
+
+    /* ── Symptom Chips ── */
+    .symptom-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+
+    .symptom-chip {
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+    }
+    .symptom-chip input[type="checkbox"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+    .chip-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      height: 100%;
+    }
+    .chip-emoji { font-size: 1.1rem; flex-shrink: 0; }
+    .chip-check {
+      margin-left: auto;
+      width: 18px; height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+      color: transparent;
+      flex-shrink: 0;
+      transition: var(--transition-fast);
+    }
+    .symptom-chip:hover .chip-inner {
+      border-color: rgba(14,165,233,0.4);
+      background: rgba(14,165,233,0.08);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .symptom-chip input:checked + .chip-inner {
+      border-color: var(--primary);
+      background: rgba(14,165,233,0.15);
+      color: var(--primary-light);
+      box-shadow: 0 0 20px rgba(14,165,233,0.2), 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .symptom-chip input:checked + .chip-inner .chip-check {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+    /* Category-specific colors */
+    .cat-general .symptom-chip input:checked + .chip-inner { border-color: var(--teal); background: rgba(20,184,166,0.15); color: #5eead4; box-shadow: 0 0 20px rgba(20,184,166,0.2); }
+    .cat-cardio .symptom-chip input:checked + .chip-inner { border-color: var(--emergency); background: rgba(239,68,68,0.12); color: #fca5a5; box-shadow: 0 0 20px var(--emergency-glow); }
+    .cat-neuro .symptom-chip input:checked + .chip-inner { border-color: var(--purple); background: rgba(139,92,246,0.12); color: var(--purple-light); box-shadow: 0 0 20px rgba(139,92,246,0.2); }
+    .cat-ortho .symptom-chip input:checked + .chip-inner { border-color: var(--warning); background: rgba(245,158,11,0.12); color: #fcd34d; box-shadow: 0 0 20px rgba(245,158,11,0.2); }
+    .symptom-chip.hidden { display: none; }
+
+    /* ── Submit Section ── */
+    .submit-section {
+      position: sticky;
+      bottom: 0;
+      background: rgba(5,13,26,0.92);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 20px 0;
+      margin-top: 40px;
+      z-index: 100;
+    }
+    .submit-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 16px; justify-content: center; }
+    .selected-info { color: var(--text-secondary); font-size: 0.9rem; }
+    .selected-info span { color: var(--primary-light); font-weight: 700; font-size: 1.1rem; }
+    .btn-analyze {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 15px 40px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 25px rgba(14,165,233,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.02em;
+    }
+    .btn-analyze:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 35px rgba(14,165,233,0.55);
+    }
+    .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── AI Analyzing Overlay ── */
+    #analyzing-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+    }
+    #analyzing-overlay.show { display: flex; }
+    .scan-ring {
+      width: 130px; height: 130px;
+      border: 4px solid rgba(14,165,233,0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .scan-ring-inner {
+      width: 100px; height: 100px;
+      border: 3px solid rgba(20,184,166,0.12);
+      border-bottom-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite reverse;
+      position: absolute;
+    }
+    .scan-center-icon {
+      position: absolute;
+      font-size: 2.2rem;
+      color: var(--primary);
+      animation: scanPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes scanPulse { 0%,100%{opacity:0.7;transform:scale(0.92)} 50%{opacity:1;transform:scale(1.12)} }
+    .scan-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 130px; height: 130px; }
+    .ai-steps { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; background: rgba(14,165,233,0.04); border: 1px solid rgba(14,165,233,0.12); border-radius: var(--radius-md); padding: 20px 24px; min-width: 320px; }
+    .ai-step { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.92rem; font-weight: 500; }
+    .ai-step.active { color: var(--primary-dark); font-weight: 700; }
+    .ai-step.done { color: var(--success); }
+    .step-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(15, 23, 42, 0.15); flex-shrink: 0; }
+    .ai-step.active .step-dot { background: var(--primary); animation: blink 1.2s infinite; }
+    .ai-step.done .step-dot { background: var(--success); }
+
+    /* ── No results msg ── */
+    .no-results-msg { text-align: center; color: var(--text-muted); padding: 40px 0; display: none; }
+    .no-results-msg i { font-size: 2.5rem; margin-bottom: 12px; color: var(--text-muted); }
+
+    @media (max-width: 576px) {
+      .symptom-grid { grid-template-columns: 1fr 1fr; }
+      .submit-inner { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold"><i class="fas fa-heartbeat me-2"></i>MediAssist</span>
-    <a href="history" class="btn btn-outline-light btn-sm me-2">
-        <i class="fas fa-history me-1"></i>History
+<div class="med-bg"></div>
+<canvas id="particles-canvas"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- AI Analyzing Overlay -->
+<div id="analyzing-overlay">
+  <div class="scan-wrap">
+    <div class="scan-ring"></div>
+    <div class="scan-ring-inner"></div>
+    <div class="scan-center-icon"><i class="fas fa-heartbeat"></i></div>
+  </div>
+  <div>
+    <h3 style="font-weight:800; font-size:1.4rem; margin-bottom:8px;" class="gradient-text">Clinical Analysis in Progress</h3>
+    <p style="color:var(--text-muted); font-size:0.9rem; text-align:center; margin-bottom:20px;">Our AI is evaluating your symptom profile</p>
+    <div class="ai-steps" id="ai-steps">
+      <div class="ai-step" id="step1"><div class="step-dot"></div> Parsing symptom data...</div>
+      <div class="ai-step" id="step2"><div class="step-dot"></div> Cross-referencing clinical database...</div>
+      <div class="ai-step" id="step3"><div class="step-dot"></div> Generating department recommendation...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="med-navbar">
+  <a href="symptoms.html" class="brand text-decoration-none">
+    <div class="brand-icon"><i class="fas fa-heartbeat"></i></div>
+    <div>
+      <div class="brand-text">MediAssist AI</div>
+      <div class="brand-sub">Symptom Analysis</div>
+    </div>
+  </a>
+  <div class="nav-actions">
+    <div id="nav-selected-badge" style="display:none; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); border-radius:999px; padding:5px 14px; font-size:0.8rem; font-weight:600; color:var(--primary-light);">
+      <i class="fas fa-check-circle me-1"></i><span id="nav-count">0</span> selected
+    </div>
+    <a href="history" class="btn-med-outline text-decoration-none" style="padding:8px 16px; font-size:0.82rem;">
+      <i class="fas fa-clock-rotate-left"></i><span class="d-none d-sm-inline">History</span>
     </a>
-    <a href="index.html" class="btn btn-outline-light btn-sm">
-        <i class="fas fa-sign-out-alt me-1"></i>Logout
+    <a href="index.html" class="btn-med-outline text-decoration-none" style="padding:8px 16px; font-size:0.82rem;">
+      <i class="fas fa-right-from-bracket"></i><span class="d-none d-sm-inline">Logout</span>
     </a>
+  </div>
 </nav>
 
-<div class="container py-4">
-    <h3 class="text-center mb-1 fw-bold">Select Your Symptoms</h3>
-    <p class="text-center text-muted mb-4">Choose all symptoms you are experiencing</p>
+<div class="med-content">
+  <div class="container">
+    <!-- Hero -->
+    <div class="symptoms-hero fade-up">
+      <div class="hero-badge"><div class="dot"></div>AI-Powered Triage System</div>
+      <h1>How are you feeling <span class="gradient-text">today?</span></h1>
+      <p>Select all symptoms you're experiencing. Our AI will analyze your profile and route you to the most relevant department.</p>
+    </div>
 
-    <form action="symptoms" method="post">
-        <div class="row g-4">
+    <!-- Search -->
+    <div class="symptom-search-wrap fade-up">
+      <i class="fas fa-magnifying-glass search-icon-left"></i>
+      <input type="text" class="symptom-search" id="symptomSearch" placeholder="Search symptoms...">
+      <i class="fas fa-times search-clear" id="searchClear" onclick="clearSearch()"></i>
+    </div>
 
-            <!-- General -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-thermometer-half me-2"></i>General</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="fever" class="me-2">🌡️ Fever</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="cough" class="me-2">😷 Cough</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="cold" class="me-2">🤧 Cold</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="weakness" class="me-2">😴 Weakness</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="body_ache" class="me-2">🦴 Body Ache</label></div>
-                </div>
-            </div>
+    <!-- Category Pills -->
+    <div class="category-pills fade-up" id="catPills">
+      <div class="cat-pill active" onclick="scrollToSection('all', this)"><i class="fas fa-th-large"></i> All</div>
+      <div class="cat-pill" onclick="scrollToSection('general', this)"><i class="fas fa-thermometer-half"></i> General</div>
+      <div class="cat-pill" onclick="scrollToSection('cardio', this)"><i class="fas fa-heart"></i> Cardiology</div>
+      <div class="cat-pill" onclick="scrollToSection('neuro', this)"><i class="fas fa-brain"></i> Neurology</div>
+      <div class="cat-pill" onclick="scrollToSection('ortho', this)"><i class="fas fa-bone"></i> Orthopedic</div>
+      <div class="cat-pill" onclick="scrollToSection('ent', this)"><i class="fas fa-ear-listen"></i> ENT</div>
+      <div class="cat-pill" onclick="scrollToSection('eyes', this)"><i class="fas fa-eye"></i> Ophthalmology</div>
+      <div class="cat-pill" onclick="scrollToSection('skin', this)"><i class="fas fa-hand-dots"></i> Dermatology</div>
+      <div class="cat-pill" onclick="scrollToSection('gastro', this)"><i class="fas fa-stomach"></i> Gastro</div>
+      <div class="cat-pill" onclick="scrollToSection('mental', this)"><i class="fas fa-head-side-brain"></i> Mental Health</div>
+      <div class="cat-pill" onclick="scrollToSection('urology', this)"><i class="fas fa-kidneys"></i> Urology</div>
+      <div class="cat-pill" onclick="scrollToSection('endo', this)"><i class="fas fa-dna"></i> Endocrine</div>
+      <div class="cat-pill" onclick="scrollToSection('dental', this)"><i class="fas fa-tooth"></i> Dental</div>
+    </div>
 
-            <!-- Cardiology -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-heart me-2"></i>Heart / Chest</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="chest_pain" class="me-2">💔 Chest Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="breathlessness" class="me-2">😮‍💨 Breathlessness</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="palpitations" class="me-2">💓 Palpitations</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="dizziness" class="me-2">😵 Dizziness</label></div>
-                </div>
-            </div>
-
-            <!-- Orthopedic -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-walking me-2"></i>Bones / Joints</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="joint_pain" class="me-2">🦵 Joint Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="swelling" class="me-2">🫁 Swelling</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="back_pain" class="me-2">🔙 Back Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="stiffness" class="me-2">🧍 Stiffness</label></div>
-                </div>
-            </div>
-
-            <!-- Neurology -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-brain me-2"></i>Neurological</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="severe_headache" class="me-2">🤕 Severe Headache</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="seizures" class="me-2">⚡ Seizures</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="numbness" class="me-2">😶 Numbness</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="blurred_speech" class="me-2">🗣️ Blurred Speech</label></div>
-                </div>
-            </div>
-
-            <!-- ENT -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-ear-listen me-2"></i>ENT</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="ear_pain" class="me-2">👂 Ear Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="hearing_loss" class="me-2">🔇 Hearing Loss</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="throat_pain" class="me-2">🤒 Throat Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="nose_bleed" class="me-2">🩸 Nose Bleed</label></div>
-                </div>
-            </div>
-
-            <!-- Eye -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-eye me-2"></i>Eyes</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="eye_pain" class="me-2">👁️ Eye Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="blurred_vision" class="me-2">🫦 Blurred Vision</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="eye_redness" class="me-2">🔴 Eye Redness</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="watering" class="me-2">💧 Watering</label></div>
-                </div>
-            </div>
-
-            <!-- Skin -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-hand-dots me-2"></i>Skin</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="skin_rash" class="me-2">🔴 Skin Rash</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="itching" class="me-2">🤚 Itching</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="acne" class="me-2">🌡️ Acne</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="hair_loss" class="me-2">💇 Hair Loss</label></div>
-                </div>
-            </div>
-
-            <!-- Gastro -->
-            <div class="col-12">
-                <h5 class="section-title"><i class="fas fa-stomach me-2"></i>Digestive</h5>
-                <div class="row g-2 mt-1">
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="stomach_pain" class="me-2">🤢 Stomach Pain</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="vomiting" class="me-2">🤮 Vomiting</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="diarrhea" class="me-2">🚽 Diarrhea</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="acidity" class="me-2">🔥 Acidity</label></div>
-                    <div class="col-6 col-md-3"><label class="symptom-card card p-3 w-100">
-                        <input type="checkbox" name="symptoms" value="bloating" class="me-2">💨 Bloating</label></div>
-                </div>
-            </div>
-
+    <!-- Emergency Banner -->
+    <div id="emergency-banner">
+      <div class="emergency-icon-wrap">🚨</div>
+      <div style="flex:1">
+        <div style="font-weight:700; color:var(--emergency); font-size:1rem; margin-bottom:4px;">
+          Emergency Symptoms Detected
         </div>
-
-        <div class="text-center mt-5">
-            <button type="submit" class="btn btn-submit text-white px-5 py-3 fw-bold fs-5">
-                <i class="fas fa-search-plus me-2"></i>Find My Department
-            </button>
+        <div style="color:rgba(255,255,255,0.75); font-size:0.87rem; margin-bottom:10px;" id="emergency-text">
+          Your selected symptoms indicate a potential medical emergency. Please seek immediate attention.
         </div>
+        <div class="emergency-severity">
+          <div class="sev-dot active"></div>
+          <div class="sev-dot active"></div>
+          <div class="sev-dot active"></div>
+          <div class="sev-dot active"></div>
+          <div class="sev-dot"></div>
+          <span style="margin-left:8px; font-size:0.75rem; color:var(--emergency); font-weight:600;">HIGH SEVERITY</span>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-med-emergency" style="padding:8px 20px; font-size:0.85rem;">
+            <i class="fas fa-phone"></i> Emergency: 108
+          </button>
+          <button class="btn-med-outline" style="border-color:rgba(239,68,68,0.4); color:#fca5a5; padding:8px 18px; font-size:0.82rem;" onclick="dismissEmergency()">
+            Continue to OPD →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No results -->
+    <div class="no-results-msg" id="noResults">
+      <i class="fas fa-search-minus d-block"></i>
+      No symptoms match "<span id="searchTerm"></span>"
+    </div>
+
+    <form action="symptoms" method="post" id="symptomForm" onsubmit="startAnalysis(event)">
+      <!-- GENERAL -->
+      <div class="category-section fade-up" id="section-general">
+        <div class="category-header cat-general-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(20,184,166,0.15); color:#5eead4;"><i class="fas fa-thermometer-half"></i></div>
+          <div class="cat-title">General</div>
+          <div class="cat-count cat-general-count">10 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid cat-general" id="grid-general">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="fever"><div class="chip-inner"><span class="chip-emoji">🌡️</span>Fever<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="cough"><div class="chip-inner"><span class="chip-emoji">😷</span>Cough<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="cold"><div class="chip-inner"><span class="chip-emoji">🤧</span>Cold<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="body_ache"><div class="chip-inner"><span class="chip-emoji">🦴</span>Body Ache<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="weakness"><div class="chip-inner"><span class="chip-emoji">😴</span>Weakness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="fatigue"><div class="chip-inner"><span class="chip-emoji">🥱</span>Fatigue<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="loss_of_appetite"><div class="chip-inner"><span class="chip-emoji">🍽️</span>Loss of Appetite<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="chills"><div class="chip-inner"><span class="chip-emoji">🥶</span>Chills<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="runny_nose"><div class="chip-inner"><span class="chip-emoji">👃</span>Runny Nose<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="sneezing"><div class="chip-inner"><span class="chip-emoji">🤧</span>Sneezing<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- CARDIOLOGY -->
+      <div class="category-section fade-up" id="section-cardio">
+        <div class="category-header cat-cardio-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(239,68,68,0.12); color:#fca5a5;"><i class="fas fa-heart"></i></div>
+          <div class="cat-title">Heart / Cardiology</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid cat-cardio" id="grid-cardio">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="chest_pain"><div class="chip-inner"><span class="chip-emoji">💔</span>Chest Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="palpitations"><div class="chip-inner"><span class="chip-emoji">💓</span>Palpitations<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="breathlessness"><div class="chip-inner"><span class="chip-emoji">😮‍💨</span>Breathlessness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="leg_swelling"><div class="chip-inner"><span class="chip-emoji">🦵</span>Leg Swelling<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="fainting"><div class="chip-inner"><span class="chip-emoji">😵</span>Fainting<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="dizziness"><div class="chip-inner"><span class="chip-emoji">🌀</span>Dizziness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="exertional_chest_pain"><div class="chip-inner"><span class="chip-emoji">🏃</span>Chest Pain on Exertion<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="exertional_breathlessness"><div class="chip-inner"><span class="chip-emoji">🚶</span>Breathlessness on Exertion<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="orthopnea"><div class="chip-inner"><span class="chip-emoji">🛏️</span>Breathless Lying Down<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- NEUROLOGY -->
+      <div class="category-section fade-up" id="section-neuro">
+        <div class="category-header cat-neuro-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(139,92,246,0.15); color:#c4b5fd;"><i class="fas fa-brain"></i></div>
+          <div class="cat-title">Neurology</div>
+          <div class="cat-count">12 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid cat-neuro" id="grid-neuro">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="severe_headache"><div class="chip-inner"><span class="chip-emoji">🤕</span>Severe Headache<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="seizures"><div class="chip-inner"><span class="chip-emoji">⚡</span>Seizures<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="blurred_speech"><div class="chip-inner"><span class="chip-emoji">🗣️</span>Slurred Speech<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="numbness"><div class="chip-inner"><span class="chip-emoji">😶</span>Numbness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="tremors"><div class="chip-inner"><span class="chip-emoji">🤲</span>Tremors<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="memory_loss"><div class="chip-inner"><span class="chip-emoji">🧠</span>Memory Loss<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="facial_droop"><div class="chip-inner"><span class="chip-emoji">😕</span>Face Drooping<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="one_sided_weakness"><div class="chip-inner"><span class="chip-emoji">💪</span>One Side Weakness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="loss_of_balance"><div class="chip-inner"><span class="chip-emoji">🤸</span>Loss of Balance<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="gait_disturbance"><div class="chip-inner"><span class="chip-emoji">🚶</span>Walking Difficulty<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="loss_of_consciousness"><div class="chip-inner"><span class="chip-emoji">😴</span>Loss of Consciousness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="neck_stiffness"><div class="chip-inner"><span class="chip-emoji">🦒</span>Neck Stiffness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- ORTHOPEDIC -->
+      <div class="category-section fade-up" id="section-ortho">
+        <div class="category-header cat-ortho-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(245,158,11,0.12); color:#fcd34d;"><i class="fas fa-bone"></i></div>
+          <div class="cat-title">Bones / Orthopedic</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid cat-ortho" id="grid-ortho">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="joint_pain"><div class="chip-inner"><span class="chip-emoji">🦵</span>Joint Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="fracture"><div class="chip-inner"><span class="chip-emoji">🦴</span>Fracture<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="back_pain"><div class="chip-inner"><span class="chip-emoji">🔙</span>Back Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="neck_pain"><div class="chip-inner"><span class="chip-emoji">🦒</span>Neck Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="stiffness"><div class="chip-inner"><span class="chip-emoji">🧍</span>Stiffness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="swelling"><div class="chip-inner"><span class="chip-emoji">🫁</span>Swelling<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="muscle_weakness"><div class="chip-inner"><span class="chip-emoji">💪</span>Muscle Weakness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="limb_pain"><div class="chip-inner"><span class="chip-emoji">🦾</span>Limb Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="inability_to_bear_weight"><div class="chip-inner"><span class="chip-emoji">🚫</span>Cannot Bear Weight<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- ENT -->
+      <div class="category-section fade-up" id="section-ent">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(6,182,212,0.15); color:#67e8f9;"><i class="fas fa-ear-listen"></i></div>
+          <div class="cat-title">ENT</div>
+          <div class="cat-count">10 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-ent">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="ear_pain"><div class="chip-inner"><span class="chip-emoji">👂</span>Ear Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="hearing_loss"><div class="chip-inner"><span class="chip-emoji">🔇</span>Hearing Loss<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="throat_pain"><div class="chip-inner"><span class="chip-emoji">🤒</span>Throat Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="nose_bleed"><div class="chip-inner"><span class="chip-emoji">🩸</span>Nose Bleed<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="sinus_pain"><div class="chip-inner"><span class="chip-emoji">😤</span>Sinus Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="ear_discharge"><div class="chip-inner"><span class="chip-emoji">💧</span>Ear Discharge<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="nasal_blockage"><div class="chip-inner"><span class="chip-emoji">👃</span>Nasal Blockage<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="tinnitus"><div class="chip-inner"><span class="chip-emoji">🔔</span>Ringing in Ear<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="voice_change"><div class="chip-inner"><span class="chip-emoji">🎙️</span>Voice Change<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="difficulty_swallowing"><div class="chip-inner"><span class="chip-emoji">🍽️</span>Difficulty Swallowing<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- OPHTHALMOLOGY -->
+      <div class="category-section fade-up" id="section-eyes">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(59,130,246,0.15); color:#93c5fd;"><i class="fas fa-eye"></i></div>
+          <div class="cat-title">Eyes / Ophthalmology</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-eyes">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="eye_pain"><div class="chip-inner"><span class="chip-emoji">👁️</span>Eye Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="eye_redness"><div class="chip-inner"><span class="chip-emoji">🔴</span>Eye Redness<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="eye_discharge"><div class="chip-inner"><span class="chip-emoji">💧</span>Eye Discharge<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="blurred_vision"><div class="chip-inner"><span class="chip-emoji">🌫️</span>Blurred Vision<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="sudden_vision_loss"><div class="chip-inner"><span class="chip-emoji">⚫</span>Sudden Vision Loss<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="double_vision"><div class="chip-inner"><span class="chip-emoji">👀</span>Double Vision<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="photophobia"><div class="chip-inner"><span class="chip-emoji">☀️</span>Light Sensitivity<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="itching_eyes"><div class="chip-inner"><span class="chip-emoji">🤚</span>Itchy Eyes<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="watering"><div class="chip-inner"><span class="chip-emoji">😢</span>Watering Eyes<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- DERMATOLOGY -->
+      <div class="category-section fade-up" id="section-skin">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(244,114,182,0.12); color:#f9a8d4;"><i class="fas fa-hand-dots"></i></div>
+          <div class="cat-title">Skin / Dermatology</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-skin">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="skin_rash"><div class="chip-inner"><span class="chip-emoji">🔴</span>Skin Rash<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="skin_lesions"><div class="chip-inner"><span class="chip-emoji">🩹</span>Skin Lesions<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="itching"><div class="chip-inner"><span class="chip-emoji">🤚</span>Itching<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="acne"><div class="chip-inner"><span class="chip-emoji">😣</span>Acne<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="hair_loss"><div class="chip-inner"><span class="chip-emoji">💇</span>Hair Loss<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="nail_changes"><div class="chip-inner"><span class="chip-emoji">💅</span>Nail Changes<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="skin_scaling"><div class="chip-inner"><span class="chip-emoji">🫧</span>Skin Scaling<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="pigmentation_changes"><div class="chip-inner"><span class="chip-emoji">🎨</span>Pigmentation Changes<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="dandruff"><div class="chip-inner"><span class="chip-emoji">❄️</span>Dandruff<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- GASTROENTEROLOGY -->
+      <div class="category-section fade-up" id="section-gastro">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(234,179,8,0.12); color:#fde047;"><i class="fas fa-stomach"></i></div>
+          <div class="cat-title">Digestive / Gastroenterology</div>
+          <div class="cat-count">11 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-gastro">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="stomach_pain"><div class="chip-inner"><span class="chip-emoji">🤢</span>Stomach Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="vomiting"><div class="chip-inner"><span class="chip-emoji">🤮</span>Vomiting<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="diarrhea"><div class="chip-inner"><span class="chip-emoji">🚽</span>Diarrhea<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="acidity"><div class="chip-inner"><span class="chip-emoji">🔥</span>Acidity<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="bloating"><div class="chip-inner"><span class="chip-emoji">💨</span>Bloating<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="constipation"><div class="chip-inner"><span class="chip-emoji">😣</span>Constipation<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="nausea"><div class="chip-inner"><span class="chip-emoji">🥴</span>Nausea<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="blood_in_stool"><div class="chip-inner"><span class="chip-emoji">🩸</span>Blood in Stool<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="jaundice"><div class="chip-inner"><span class="chip-emoji">🟡</span>Jaundice<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="vomiting_blood"><div class="chip-inner"><span class="chip-emoji">🩸</span>Vomiting Blood<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="black_stools"><div class="chip-inner"><span class="chip-emoji">⬛</span>Black Stools<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- MENTAL HEALTH -->
+      <div class="category-section fade-up" id="section-mental">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(139,92,246,0.12); color:#c4b5fd;"><i class="fas fa-head-side-brain"></i></div>
+          <div class="cat-title">Mental Health</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-mental">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="anxiety"><div class="chip-inner"><span class="chip-emoji">😰</span>Anxiety<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="depression"><div class="chip-inner"><span class="chip-emoji">😔</span>Depression<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="panic_attacks"><div class="chip-inner"><span class="chip-emoji">😱</span>Panic Attacks<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="hallucinations"><div class="chip-inner"><span class="chip-emoji">👻</span>Hallucinations<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="insomnia"><div class="chip-inner"><span class="chip-emoji">🌙</span>Insomnia<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="mood_swings"><div class="chip-inner"><span class="chip-emoji">🎭</span>Mood Swings<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="irritability"><div class="chip-inner"><span class="chip-emoji">😤</span>Irritability<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="poor_concentration"><div class="chip-inner"><span class="chip-emoji">🤔</span>Poor Concentration<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="suicidal_thoughts"><div class="chip-inner"><span class="chip-emoji">⚠️</span>Suicidal Thoughts<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- UROLOGY -->
+      <div class="category-section fade-up" id="section-urology">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(14,165,233,0.12); color:#7dd3fc;"><i class="fas fa-kidneys"></i></div>
+          <div class="cat-title">Urology</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-urology">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="burning_urination"><div class="chip-inner"><span class="chip-emoji">🔥</span>Burning Urination<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="blood_in_urine"><div class="chip-inner"><span class="chip-emoji">🩸</span>Blood in Urine<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="difficulty_urinating"><div class="chip-inner"><span class="chip-emoji">😖</span>Difficulty Urinating<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="kidney_pain"><div class="chip-inner"><span class="chip-emoji">🫁</span>Kidney Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="frequent_urination"><div class="chip-inner"><span class="chip-emoji">🚻</span>Frequent Urination<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="urgency"><div class="chip-inner"><span class="chip-emoji">⚡</span>Urinary Urgency<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="poor_stream"><div class="chip-inner"><span class="chip-emoji">💧</span>Poor Urine Stream<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="incontinence"><div class="chip-inner"><span class="chip-emoji">😰</span>Incontinence<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="scrotal_pain"><div class="chip-inner"><span class="chip-emoji">⚠️</span>Scrotal Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- ENDOCRINOLOGY -->
+      <div class="category-section fade-up" id="section-endo">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(16,185,129,0.12); color:#6ee7b7;"><i class="fas fa-dna"></i></div>
+          <div class="cat-title">Hormonal / Endocrine</div>
+          <div class="cat-count">7 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-endo">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="excessive_thirst"><div class="chip-inner"><span class="chip-emoji">🥤</span>Excessive Thirst<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="thyroid_swelling"><div class="chip-inner"><span class="chip-emoji">🦋</span>Thyroid Swelling<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="excessive_hunger"><div class="chip-inner"><span class="chip-emoji">🍔</span>Excessive Hunger<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="unexplained_weight_change"><div class="chip-inner"><span class="chip-emoji">⚖️</span>Weight Change<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="excessive_sweating"><div class="chip-inner"><span class="chip-emoji">💦</span>Excessive Sweating<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="heat_cold_intolerance"><div class="chip-inner"><span class="chip-emoji">🌡️</span>Heat/Cold Intolerance<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="neck_swelling"><div class="chip-inner"><span class="chip-emoji">🦒</span>Neck Swelling<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- DENTAL -->
+      <div class="category-section fade-up" id="section-dental">
+        <div class="category-header" onclick="toggleCategory(this)">
+          <div class="cat-icon-box" style="background:rgba(248,113,113,0.12); color:#fca5a5;"><i class="fas fa-tooth"></i></div>
+          <div class="cat-title">Dental</div>
+          <div class="cat-count">9 symptoms</div>
+          <i class="fas fa-chevron-down cat-chevron"></i>
+        </div>
+        <div class="symptom-grid" id="grid-dental">
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="tooth_pain"><div class="chip-inner"><span class="chip-emoji">🦷</span>Tooth Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="gum_bleeding"><div class="chip-inner"><span class="chip-emoji">🩸</span>Gum Bleeding<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="swollen_gums"><div class="chip-inner"><span class="chip-emoji">😬</span>Swollen Gums<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="tooth_sensitivity"><div class="chip-inner"><span class="chip-emoji">🥶</span>Tooth Sensitivity<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="jaw_pain"><div class="chip-inner"><span class="chip-emoji">😤</span>Jaw Pain<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="bad_breath"><div class="chip-inner"><span class="chip-emoji">💨</span>Bad Breath<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="mouth_ulcer"><div class="chip-inner"><span class="chip-emoji">🔴</span>Mouth Ulcer<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="loose_tooth"><div class="chip-inner"><span class="chip-emoji">🦷</span>Loose Tooth<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+          <label class="symptom-chip"><input type="checkbox" name="symptoms" value="difficulty_chewing"><div class="chip-inner"><span class="chip-emoji">😣</span>Difficulty Chewing<span class="chip-check"><i class="fas fa-check"></i></span></div></label>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-section">
+        <div class="submit-inner">
+          <div class="selected-info">
+            <span id="selectedCount">0</span> symptoms selected
+          </div>
+          <button type="submit" class="btn-analyze ripple-btn" id="analyzeBtn">
+            <i class="fas fa-microscope"></i>
+            Analyze My Symptoms
+          </button>
+        </div>
+      </div>
     </form>
+
+    <!-- Future Features -->
+    <div style="padding: 60px 0 40px;">
+      <div style="text-align:center; margin-bottom:28px;">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.2); border-radius:999px; padding:6px 16px; font-size:0.75rem; font-weight:600; color:var(--purple-light); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:16px;">
+          🚀 Coming Soon
+        </div>
+        <h3 style="font-weight:700; font-size:1.3rem;">Future AI Features</h3>
+        <p style="color:var(--text-muted); font-size:0.88rem; margin-top:8px;">Advanced capabilities being developed for the next release</p>
+      </div>
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="glass-card-sm p-3 text-center" style="opacity:0.6;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🎙️</div>
+            <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Voice Input</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Speak your symptoms</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card-sm p-3 text-center" style="opacity:0.6;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🤖</div>
+            <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">AI Chatbot</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Conversational diagnosis</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card-sm p-3 text-center" style="opacity:0.6;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🗺️</div>
+            <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Hospital Locator</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Real-time nearby hospitals</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="glass-card-sm p-3 text-center" style="opacity:0.6;">
+            <div style="font-size:1.8rem; margin-bottom:8px;">⌚</div>
+            <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Wearable Sync</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Vitals from smartwatch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+// ── Particles ──
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const symbols = ['+', '♥', '✚', '◌', '·'];
+const particles = Array.from({length: 35}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  sym: symbols[Math.floor(Math.random() * symbols.length)],
+  size: Math.random() * 14 + 8,
+  speed: Math.random() * 0.4 + 0.1,
+  opacity: Math.random() * 0.15 + 0.04,
+  drift: (Math.random() - 0.5) * 0.3
+}));
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.sym === '♥' ? '#ef4444' : '#0ea5e9';
+    ctx.font = `${p.size}px Inter`;
+    ctx.fillText(p.sym, p.x, p.y);
+    p.y -= p.speed;
+    p.x += p.drift;
+    if (p.y < -20) { p.y = canvas.height + 20; p.x = Math.random() * canvas.width; }
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ── Scroll fade-in ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.05 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── Symptom selection & counter ──
+let selectedCount = 0;
+const EMERGENCY_COMBOS = [
+  ['chest_pain', 'breathlessness', 'fainting'],
+  ['facial_droop', 'blurred_speech', 'one_sided_weakness'],
+  ['chest_pain', 'breathlessness'],
+  ['seizures', 'loss_of_consciousness'],
+  ['vomiting_blood', 'black_stools'],
+];
+
+function updateCounter() {
+  const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+  selectedCount = checked.length;
+  document.getElementById('selectedCount').textContent = selectedCount;
+  document.getElementById('nav-count').textContent = selectedCount;
+  const badge = document.getElementById('nav-selected-badge');
+  badge.style.display = selectedCount > 0 ? 'block' : 'none';
+
+  // Emergency check
+  const vals = Array.from(checked).map(c => c.value);
+  let emergency = false;
+  let emergencyMsg = '';
+  for (const combo of EMERGENCY_COMBOS) {
+    if (combo.every(s => vals.includes(s))) {
+      emergency = true;
+      if (combo.includes('chest_pain') && combo.includes('breathlessness')) {
+        emergencyMsg = '⚠️ Chest pain + breathlessness detected. This may indicate cardiac emergency. Go to Emergency/Casualty immediately!';
+      } else if (combo.includes('facial_droop')) {
+        emergencyMsg = '⚠️ Stroke warning signs detected (FAST: Face drooping, Arm weakness, Speech difficulty). Call emergency services NOW!';
+      } else {
+        emergencyMsg = '⚠️ Your symptoms indicate a potential medical emergency. Seek immediate care.';
+      }
+      break;
+    }
+  }
+  const banner = document.getElementById('emergency-banner');
+  if (emergency) {
+    document.getElementById('emergency-text').textContent = emergencyMsg;
+    banner.classList.add('show');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', updateCounter);
+});
+
+function dismissEmergency() {
+  document.getElementById('emergency-banner').classList.remove('show');
+}
+
+// ── Search ──
+const searchInput = document.getElementById('symptomSearch');
+searchInput.addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  const clearBtn = document.getElementById('searchClear');
+  clearBtn.style.display = q ? 'block' : 'none';
+  document.getElementById('searchTerm').textContent = q;
+  let anyVisible = false;
+  document.querySelectorAll('.symptom-chip').forEach(chip => {
+    const text = chip.querySelector('.chip-inner').textContent.toLowerCase();
+    const match = !q || text.includes(q);
+    chip.classList.toggle('hidden', !match);
+    if (match) anyVisible = true;
+  });
+  document.getElementById('noResults').style.display = (!anyVisible && q) ? 'block' : 'none';
+  document.querySelectorAll('.category-section').forEach(sec => {
+    const visible = [...sec.querySelectorAll('.symptom-chip')].some(c => !c.classList.contains('hidden'));
+    sec.style.display = visible ? '' : 'none';
+  });
+});
+
+function clearSearch() {
+  searchInput.value = '';
+  searchInput.dispatchEvent(new Event('input'));
+}
+
+// ── Category toggle ──
+function toggleCategory(header) {
+  const grid = header.nextElementSibling;
+  if (grid) {
+    const isCollapsed = header.classList.contains('collapsed');
+    if (isCollapsed) {
+      grid.style.display = 'grid';
+      header.classList.remove('collapsed');
+    } else {
+      grid.style.display = 'none';
+      header.classList.add('collapsed');
+    }
+  }
+}
+
+// ── Scroll to section ──
+function scrollToSection(id, pill) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  if (id === 'all') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  const section = document.getElementById('section-' + id);
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── AI Analysis overlay ──
+function startAnalysis(e) {
+  const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+  if (checked.length === 0) {
+    e.preventDefault();
+    showToast('error', '⚕️ Please select at least one symptom to continue.');
+    return;
+  }
+  const overlay = document.getElementById('analyzing-overlay');
+  overlay.classList.add('show');
+  const steps = ['step1', 'step2', 'step3'];
+  let i = 0;
+  function nextStep() {
+    if (i < steps.length) {
+      if (i > 0) document.getElementById(steps[i-1]).classList.remove('active');
+      if (i > 0) document.getElementById(steps[i-1]).classList.add('done');
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+      setTimeout(nextStep, 900);
+    }
+  }
+  nextStep();
+}
+
+// ── Ripple ──
+document.querySelectorAll('.ripple-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    const rect = this.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
+    this.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+});
+
+// ── Toast ──
+function showToast(type, message) {
+  const container = document.getElementById('toast-container');
+  const icons = { error: 'fa-circle-exclamation', success: 'fa-circle-check', info: 'fa-circle-info' };
+  const toast = document.createElement('div');
+  toast.className = `med-toast toast-${type}`;
+  toast.innerHTML = `<i class="fas ${icons[type]} toast-icon"></i><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.classList.add('toast-out'); setTimeout(() => toast.remove(), 300); }, 4000);
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

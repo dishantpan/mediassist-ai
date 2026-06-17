@@ -6,12 +6,26 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/mediassist?useSSL=false&serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASS = "Dish@7890"; // ← yahan apna password
+    private static final String URL;
+    private static final String USER;
+    private static final String PASS;
 
     static {
+        String envUrl = System.getenv("DB_URL");
+        String envUser = System.getenv("DB_USER");
+        String envPass = System.getenv("DB_PASS");
+
+        if (envUrl != null && !envUrl.isEmpty()) {
+            URL = envUrl;
+            USER = envUser;
+            PASS = envPass;
+        } else {
+            // Local development fallback
+            URL = "jdbc:mysql://localhost:3306/mediassist?useSSL=false&serverTimezone=UTC";
+            USER = "root";
+            PASS = "Dish@7890";
+        }
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {

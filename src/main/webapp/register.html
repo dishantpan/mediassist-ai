@@ -1,63 +1,1169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MediAssist — Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 100vh; }
-        .card { border-radius: 20px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); border: none; border-radius: 10px; }
-        .form-control { border-radius: 10px; padding: 12px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MediAssist AI — Create your free account and get AI-powered hospital department recommendations instantly." />
+  <meta name="keywords" content="MediAssist, AI healthcare, hospital recommendation, medical assistant, register, sign up" />
+  <meta name="author" content="MediAssist AI" />
+  <meta property="og:title" content="MediAssist AI — Create Account" />
+  <meta property="og:description" content="Join MediAssist AI for smart, AI-powered hospital department recommendations." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <title>MediAssist AI — Create Account</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Font Awesome 6.4 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <!-- Google Fonts: Inter + Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Shared Design System -->
+  <link rel="stylesheet" href="css/mediassist.css" />
+
+  <style>
+    /* ── Page Layout ── */
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      font-family: 'Inter', 'Poppins', sans-serif;
+    }
+
+    /* ── Register Card Entrance ── */
+    .register-card {
+      width: 100%;
+      max-width: 500px;
+      padding: 2.75rem 2.5rem 2.25rem;
+      animation: cardEntrance 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(40px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Brand Header ── */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      box-shadow: 0 8px 30px rgba(14,165,233,0.45), 0 0 0 6px rgba(14,165,233,0.1);
+      margin-bottom: 1rem;
+      animation: heartbeat 2s ease-in-out infinite;
+      font-size: 1.75rem;
+      color: white;
+    }
+
+    .brand-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8, #14b8a6, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .brand-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .page-heading {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Progress Stepper ── */
+    .progress-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      transition: all 0.45s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .step-circle.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: white;
+      box-shadow: 0 0 0 5px rgba(14,165,233,0.18), 0 4px 16px rgba(14,165,233,0.35);
+    }
+
+    .step-circle.done {
+      border-color: var(--success);
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      box-shadow: 0 0 0 5px rgba(16,185,129,0.15);
+    }
+
+    .step-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+
+    .step-label.active { color: var(--primary-light); }
+    .step-label.done   { color: var(--success); }
+
+    .step-connector {
+      width: 80px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 4px;
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .step-connector-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      transition: width 0.55s cubic-bezier(0.4,0,0.2,1);
+      border-radius: 2px;
+    }
+
+    .step-connector-fill.filled { width: 100%; }
+
+    /* ── Form Steps ── */
+    .form-step {
+      display: none;
+      animation: stepIn 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+
+    .form-step.active {
+      display: block;
+    }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes stepBack {
+      from { opacity: 0; transform: translateX(-28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-step.step-back-anim {
+      animation: stepBack 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+
+    /* ── Input with Icon (right side override) ── */
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper .float-label-group {
+      margin-bottom: 0;
+    }
+
+    .input-wrapper .right-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .right-icon.validation-icon {
+      pointer-events: none;
+    }
+
+    .right-icon.valid   { color: var(--success); }
+    .right-icon.invalid { color: var(--emergency); }
+    .right-icon.neutral { color: var(--text-muted); }
+
+    .float-label-group input.has-icon {
+      padding-right: 44px;
+    }
+
+    /* ── Password Strength Meter ── */
+    .strength-meter {
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .strength-bar-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .strength-seg {
+      flex: 1;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      transition: background 0.35s ease;
+    }
+
+    .strength-seg.s1 { background: #ef4444; }
+    .strength-seg.s2 { background: #f59e0b; }
+    .strength-seg.s3 { background: #06b6d4; }
+    .strength-seg.s4 { background: #10b981; }
+
+    .strength-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .strength-label.weak   { color: #ef4444; }
+    .strength-label.fair   { color: #f59e0b; }
+    .strength-label.good   { color: #06b6d4; }
+    .strength-label.strong { color: #10b981; }
+
+    /* ── Match Indicator ── */
+    .match-hint {
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin-top: 6px;
+      min-height: 18px;
+      transition: color 0.3s;
+    }
+    .match-hint.match   { color: var(--success); }
+    .match-hint.no-match{ color: var(--emergency); }
+
+    /* ── Action Buttons ── */
+    .btn-continue {
+      width: 100%;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(14,165,233,0.35);
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+
+    .btn-continue:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(14,165,233,0.55);
+      background: linear-gradient(135deg, #38bdf8, #14b8a6);
+    }
+
+    .btn-continue:active { transform: translateY(0); }
+
+    .btn-back {
+      flex: 1;
+      padding: 13px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-back:hover {
+      border-color: var(--primary);
+      color: var(--primary-light);
+      background: rgba(14,165,233,0.07);
+    }
+
+    .btn-submit {
+      flex: 2;
+      padding: 13px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(14,165,233,0.35);
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(14,165,233,0.55);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    .step2-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 0.5rem;
+    }
+
+    /* ── Field validation states ── */
+    .float-label-group input.is-valid-field {
+      border-color: var(--success) !important;
+    }
+    .float-label-group input.is-invalid-field {
+      border-color: var(--emergency) !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.12) !important;
+    }
+
+    /* ── Login Link ── */
+    .login-link-wrap {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .login-link-wrap a {
+      color: var(--primary-light);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .login-link-wrap a:hover {
+      color: var(--teal);
+      text-decoration: underline;
+    }
+
+    /* ── Trust Badges ── */
+    .trust-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .trust-item i {
+      font-size: 0.8rem;
+      color: var(--success);
+    }
+
+    /* ── Submit Success Overlay ── */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(5, 13, 26, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .success-overlay.visible { display: flex; }
+
+    .success-checkmark {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--success), #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: white;
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.5);
+      animation: checkPulse 1s ease-out forwards;
+    }
+
+    @keyframes checkPulse {
+      0%   { transform: scale(0.4); box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+      50%  { transform: scale(1.1); box-shadow: 0 0 0 25px rgba(16,185,129,0); }
+      100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    .success-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .success-sub {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* ── Divider ── */
+    .form-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin: 1.5rem 0 1.25rem;
+    }
+
+    /* ── Step label inside card ── */
+    .step-heading {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-heading i {
+      color: var(--primary-light);
+      font-size: 0.95rem;
+    }
+
+    /* ── Input field spacing for step 2 ── */
+    #step2 .float-label-group {
+      margin-bottom: 20px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 576px) {
+      .register-card {
+        padding: 2rem 1.5rem 1.75rem;
+      }
+      .step-connector { width: 50px; }
+      .brand-title { font-size: 1.4rem; }
+      .trust-row { flex-wrap: wrap; gap: 10px; }
+    }
+
+    @media (max-width: 360px) {
+      .register-card { padding: 1.5rem 1.1rem; }
+      .step-connector { width: 30px; }
+    }
+  </style>
 </head>
-<body class="d-flex align-items-center justify-content-center py-4">
-<div class="container" style="max-width: 440px;">
-    <div class="card p-5">
-        <div class="text-center mb-4">
-            <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
-            <h2 class="fw-bold">Create Account</h2>
-            <p class="text-muted">Join MediAssist today</p>
+<body>
+
+  <!-- ════════════ ANIMATED BACKGROUND ════════════ -->
+  <div class="med-bg"></div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ════════════ TOAST CONTAINER ════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ════════════ SUCCESS OVERLAY ════════════ -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-checkmark">
+      <i class="fas fa-check"></i>
+    </div>
+    <div class="success-text">Account Created!</div>
+    <div class="success-sub">Redirecting you to login…</div>
+  </div>
+
+  <!-- ════════════ PAGE CONTENT ════════════ -->
+  <div class="med-content w-100 d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 2rem 1rem;">
+
+    <div class="glass-card register-card">
+
+      <!-- Brand Header -->
+      <div class="brand-header">
+        <div class="brand-logo-wrap">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="brand-title">MediAssist <span style="font-weight:300;">AI</span></div>
+        <div class="brand-sub">Smart Healthcare · AI Powered</div>
+        <div class="page-heading">Create your free account</div>
+      </div>
+
+      <!-- ── Progress Stepper ── -->
+      <div class="progress-stepper" id="progressStepper">
+        <!-- Step 1 -->
+        <div class="step-item">
+          <div class="step-circle active" id="circle1">
+            <i class="fas fa-user" style="font-size:0.8rem;"></i>
+          </div>
+          <span class="step-label active" id="label1">Personal Info</span>
         </div>
 
-        <div id="errorMsg" class="alert alert-danger d-none"></div>
+        <!-- Connector -->
+        <div class="step-connector">
+          <div class="step-connector-fill" id="connectorFill"></div>
+        </div>
 
-        <form action="register" method="post">
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Full Name</label>
-                <input type="text" name="name" class="form-control"
-                       placeholder="Enter your full name" required>
+        <!-- Step 2 -->
+        <div class="step-item">
+          <div class="step-circle" id="circle2">2</div>
+          <span class="step-label" id="label2">Security</span>
+        </div>
+      </div>
+
+      <!-- ════ FORM ════ -->
+      <form action="register" method="post" id="registerForm" novalidate>
+
+        <!-- ══ STEP 1: Personal Info ══ -->
+        <div class="form-step active" id="step1">
+
+          <div class="step-heading">
+            <i class="fas fa-id-card"></i>
+            Tell us about yourself
+          </div>
+
+          <!-- Full Name -->
+          <div class="float-label-group">
+            <input
+              type="text"
+              id="nameInput"
+              name="name"
+              placeholder=" "
+              class="has-icon"
+              required
+              autocomplete="name"
+              spellcheck="false"
+            />
+            <label for="nameInput">Full Name</label>
+            <span class="input-icon neutral" id="nameIcon">
+              <i class="fas fa-user"></i>
+            </span>
+          </div>
+
+          <!-- Email with live validation -->
+          <div class="input-wrapper" style="margin-bottom: 24px;">
+            <div class="float-label-group" style="margin-bottom:0;">
+              <input
+                type="email"
+                id="emailInput"
+                name="email"
+                placeholder=" "
+                class="has-icon"
+                required
+                autocomplete="email"
+                spellcheck="false"
+              />
+              <label for="emailInput">Email Address</label>
             </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Email</label>
-                <input type="email" name="email" class="form-control"
-                       placeholder="Enter your email" required>
+            <span class="right-icon validation-icon neutral" id="emailValidIcon">
+              <i class="fas fa-envelope" id="emailIconTag"></i>
+            </span>
+          </div>
+
+          <!-- Continue Button -->
+          <button type="button" class="btn-continue ripple-btn" id="btnContinue">
+            <span>Continue</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+
+        </div><!-- /step1 -->
+
+        <!-- ══ STEP 2: Security ══ -->
+        <div class="form-step" id="step2">
+
+          <div class="step-heading">
+            <i class="fas fa-shield-halved"></i>
+            Secure your account
+          </div>
+
+          <!-- Password with eye toggle -->
+          <div class="float-label-group">
+            <input
+              type="password"
+              id="passwordInput"
+              name="password"
+              placeholder=" "
+              class="has-icon"
+              required
+              autocomplete="new-password"
+            />
+            <label for="passwordInput">Password</label>
+            <span class="input-icon" id="eyeToggle" onclick="togglePassword()" title="Show/hide password">
+              <i class="fas fa-eye" id="eyeIcon"></i>
+            </span>
+          </div>
+
+          <!-- Password Strength Meter -->
+          <div class="strength-meter" id="strengthMeter" style="display:none;">
+            <div class="strength-bar-row">
+              <div class="strength-seg" id="seg1"></div>
+              <div class="strength-seg" id="seg2"></div>
+              <div class="strength-seg" id="seg3"></div>
+              <div class="strength-seg" id="seg4"></div>
             </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Password</label>
-                <input type="password" name="password" class="form-control"
-                       placeholder="Create a password" required>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="strength-label" id="strengthLabel">Weak</span>
+              <span style="font-size:0.68rem; color: var(--text-muted);">Password strength</span>
             </div>
-            <button type="submit" class="btn btn-success w-100 py-2 fw-bold text-white">
-                <i class="fas fa-user-plus me-2"></i>Register
+          </div>
+
+          <div style="height: 16px;"></div>
+
+          <!-- Confirm Password (client-side only, NOT submitted) -->
+          <div class="float-label-group">
+            <input
+              type="password"
+              id="confirmInput"
+              placeholder=" "
+              class="has-icon"
+              autocomplete="new-password"
+            />
+            <label for="confirmInput">Confirm Password</label>
+            <span class="input-icon neutral" id="confirmIcon">
+              <i class="fas fa-lock"></i>
+            </span>
+          </div>
+
+          <!-- Match hint -->
+          <div class="match-hint" id="matchHint"></div>
+
+          <!-- Step 2 Actions -->
+          <div class="step2-actions" style="margin-top: 1.25rem;">
+            <button type="button" class="btn-back ripple-btn" id="btnBack">
+              <i class="fas fa-arrow-left"></i>
+              <span>Back</span>
             </button>
-        </form>
-        <p class="text-center mt-3 mb-0">
-            Already registered? <a href="index.html" class="text-success fw-semibold">Login here</a>
-        </p>
-    </div>
-</div>
-<script>
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('error') === 'exists') {
-        document.getElementById('errorMsg').classList.remove('d-none');
-        document.getElementById('errorMsg').textContent = 'Email already registered!';
+            <button type="submit" class="btn-submit ripple-btn" id="btnSubmit">
+              <i class="fas fa-user-plus"></i>
+              <span>Create My Account</span>
+            </button>
+          </div>
+
+        </div><!-- /step2 -->
+
+      </form>
+
+      <!-- Divider -->
+      <hr class="form-divider" />
+
+      <!-- Login Link -->
+      <div class="login-link-wrap">
+        Already have an account?&nbsp;
+        <a href="index.html"><i class="fas fa-sign-in-alt me-1" style="font-size:0.8rem;"></i>Sign in here</a>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="trust-row">
+        <div class="trust-item">
+          <i class="fas fa-lock"></i>
+          <span>256-bit SSL</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-shield-halved"></i>
+          <span>HIPAA Safe</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-user-secret"></i>
+          <span>Private &amp; Secure</span>
+        </div>
+      </div>
+
+    </div><!-- /register-card -->
+  </div><!-- /med-content -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ═══════════════════════════════════════════════
+       MediAssist AI — Register Page JavaScript
+       Multi-step form, validations, animations
+    ═══════════════════════════════════════════════ */
+
+    // ── DOM References ──────────────────────────────
+    const step1El      = document.getElementById('step1');
+    const step2El      = document.getElementById('step2');
+    const circle1      = document.getElementById('circle1');
+    const circle2      = document.getElementById('circle2');
+    const label1       = document.getElementById('label1');
+    const label2       = document.getElementById('label2');
+    const connFill     = document.getElementById('connectorFill');
+    const btnContinue  = document.getElementById('btnContinue');
+    const btnBack      = document.getElementById('btnBack');
+    const btnSubmit    = document.getElementById('btnSubmit');
+    const nameInput    = document.getElementById('nameInput');
+    const emailInput   = document.getElementById('emailInput');
+    const passwordInput= document.getElementById('passwordInput');
+    const confirmInput = document.getElementById('confirmInput');
+    const eyeIcon      = document.getElementById('eyeIcon');
+    const strengthMeter= document.getElementById('strengthMeter');
+    const strengthLabel= document.getElementById('strengthLabel');
+    const matchHint    = document.getElementById('matchHint');
+    const emailValidIcon= document.getElementById('emailValidIcon');
+    const emailIconTag = document.getElementById('emailIconTag');
+    const nameIcon     = document.getElementById('nameIcon');
+    const confirmIcon  = document.getElementById('confirmIcon');
+    const registerForm = document.getElementById('registerForm');
+    const successOverlay = document.getElementById('successOverlay');
+
+    let currentStep = 1;
+    let passwordVisible = false;
+
+    // ── Toast System ─────────────────────────────────
+    function showToast(message, type = 'info', duration = 4500) {
+      const container = document.getElementById('toast-container');
+      const icons = { error: 'fa-circle-xmark', success: 'fa-circle-check', info: 'fa-circle-info' };
+      const toast = document.createElement('div');
+      toast.className = `med-toast toast-${type}`;
+      toast.innerHTML = `
+        <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
+        <span style="flex:1; color: var(--text-primary);">${message}</span>
+        <span onclick="dismissToast(this.parentElement)" style="cursor:pointer; color:var(--text-muted); font-size:1rem; line-height:1;">
+          <i class="fas fa-xmark"></i>
+        </span>`;
+      container.appendChild(toast);
+      setTimeout(() => dismissToast(toast), duration);
     }
-    if (params.get('error') === 'failed') {
-        document.getElementById('errorMsg').classList.remove('d-none');
-        document.getElementById('errorMsg').textContent = 'Registration failed. Try again.';
+
+    function dismissToast(toast) {
+      if (!toast || !toast.parentElement) return;
+      toast.classList.add('toast-out');
+      setTimeout(() => toast.remove(), 320);
     }
-</script>
+
+    // ── URL Param Handling ───────────────────────────
+    (function handleURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const err = params.get('error');
+      if (err === 'exists') {
+        setTimeout(() => showToast('⚠️ That email is already registered. Please sign in.', 'error', 6000), 600);
+      } else if (err === 'failed') {
+        setTimeout(() => showToast('Something went wrong during registration. Please try again.', 'error', 6000), 600);
+      }
+    })();
+
+    // ── Email Regex Validation ───────────────────────
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function validateEmail(val) {
+      return emailRegex.test(val.trim());
+    }
+
+    emailInput.addEventListener('input', function () {
+      const val = this.value;
+      if (val.length === 0) {
+        emailValidIcon.className = 'right-icon validation-icon neutral';
+        emailIconTag.className = 'fas fa-envelope';
+        this.classList.remove('is-valid-field', 'is-invalid-field');
+        return;
+      }
+      if (validateEmail(val)) {
+        emailValidIcon.className = 'right-icon validation-icon valid';
+        emailIconTag.className = 'fas fa-circle-check';
+        this.classList.add('is-valid-field');
+        this.classList.remove('is-invalid-field');
+      } else {
+        emailValidIcon.className = 'right-icon validation-icon invalid';
+        emailIconTag.className = 'fas fa-circle-xmark';
+        this.classList.add('is-invalid-field');
+        this.classList.remove('is-valid-field');
+      }
+    });
+
+    // Name icon swap on focus/blur
+    nameInput.addEventListener('focus', () => {
+      nameIcon.innerHTML = '<i class="fas fa-user-pen"></i>';
+      nameIcon.style.color = 'var(--primary-light)';
+    });
+    nameInput.addEventListener('blur', () => {
+      nameIcon.innerHTML = '<i class="fas fa-user"></i>';
+      nameIcon.style.color = nameInput.value ? 'var(--success)' : 'var(--text-muted)';
+    });
+
+    // ── Step Navigation ──────────────────────────────
+    function goToStep2() {
+      const name  = nameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      if (!name) {
+        nameInput.classList.add('is-invalid-field');
+        nameInput.focus();
+        showToast('Please enter your full name.', 'error', 3000);
+        shakeField(nameInput);
+        return;
+      }
+      if (name.length < 2) {
+        nameInput.classList.add('is-invalid-field');
+        showToast('Name must be at least 2 characters.', 'error', 3000);
+        shakeField(nameInput);
+        return;
+      }
+      if (!email) {
+        emailInput.classList.add('is-invalid-field');
+        emailInput.focus();
+        showToast('Please enter your email address.', 'error', 3000);
+        shakeField(emailInput);
+        return;
+      }
+      if (!validateEmail(email)) {
+        emailInput.classList.add('is-invalid-field');
+        emailInput.focus();
+        showToast('Please enter a valid email address.', 'error', 3000);
+        shakeField(emailInput);
+        return;
+      }
+
+      // Transition to step 2
+      step1El.classList.remove('active');
+      step2El.classList.add('active');
+      step2El.classList.remove('step-back-anim');
+
+      // Update stepper
+      circle1.className = 'step-circle done';
+      circle1.innerHTML = '<i class="fas fa-check" style="font-size:0.8rem;"></i>';
+      label1.className = 'step-label done';
+
+      circle2.className = 'step-circle active';
+      circle2.innerHTML = '<i class="fas fa-lock" style="font-size:0.8rem;"></i>';
+      label2.className = 'step-label active';
+
+      connFill.classList.add('filled');
+
+      currentStep = 2;
+      setTimeout(() => passwordInput.focus(), 400);
+    }
+
+    function goToStep1() {
+      step2El.classList.remove('active');
+      step1El.classList.add('active');
+      step1El.style.animation = 'none';
+      setTimeout(() => { step1El.style.animation = ''; }, 10);
+
+      // Restore step 1 stepper
+      circle1.className = 'step-circle active';
+      circle1.innerHTML = '<i class="fas fa-user" style="font-size:0.8rem;"></i>';
+      label1.className = 'step-label active';
+
+      circle2.className = 'step-circle';
+      circle2.innerHTML = '2';
+      label2.className = 'step-label';
+
+      connFill.classList.remove('filled');
+      currentStep = 1;
+    }
+
+    btnContinue.addEventListener('click', goToStep2);
+    btnBack.addEventListener('click', goToStep1);
+
+    // ── Password Toggle ──────────────────────────────
+    function togglePassword() {
+      passwordVisible = !passwordVisible;
+      passwordInput.type = passwordVisible ? 'text' : 'password';
+      eyeIcon.className  = passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
+    }
+
+    // ── Password Strength ────────────────────────────
+    const segs = [document.getElementById('seg1'), document.getElementById('seg2'),
+                  document.getElementById('seg3'), document.getElementById('seg4')];
+
+    function calcPasswordScore(pw) {
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return Math.min(score, 4);
+    }
+
+    const strengthConfig = [
+      { label: 'Weak',   cls: 'weak',   segClass: 's1', count: 1 },
+      { label: 'Fair',   cls: 'fair',   segClass: 's2', count: 2 },
+      { label: 'Good',   cls: 'good',   segClass: 's3', count: 3 },
+      { label: 'Strong', cls: 'strong', segClass: 's4', count: 4 },
+    ];
+
+    passwordInput.addEventListener('input', function () {
+      const pw = this.value;
+
+      if (pw.length === 0) {
+        strengthMeter.style.display = 'none';
+        segs.forEach(s => { s.className = 'strength-seg'; });
+        checkMatch();
+        return;
+      }
+
+      strengthMeter.style.display = 'block';
+      const score = calcPasswordScore(pw);
+      const cfg   = strengthConfig[score - 1] || strengthConfig[0];
+
+      // Color segments
+      segs.forEach((s, i) => {
+        s.className = 'strength-seg';
+        if (i < cfg.count) s.classList.add(cfg.segClass);
+      });
+
+      strengthLabel.textContent = cfg.label;
+      strengthLabel.className   = `strength-label ${cfg.cls}`;
+
+      checkMatch();
+    });
+
+    // ── Confirm Password Match ───────────────────────
+    confirmInput.addEventListener('input', checkMatch);
+
+    function checkMatch() {
+      const pw  = passwordInput.value;
+      const cpw = confirmInput.value;
+      if (!cpw) {
+        matchHint.textContent = '';
+        matchHint.className   = 'match-hint';
+        confirmIcon.className = 'input-icon neutral';
+        confirmIcon.innerHTML = '<i class="fas fa-lock"></i>';
+        confirmInput.classList.remove('is-valid-field', 'is-invalid-field');
+        return;
+      }
+      if (pw === cpw) {
+        matchHint.textContent = '✓ Passwords match';
+        matchHint.className   = 'match-hint match';
+        confirmIcon.className = 'input-icon';
+        confirmIcon.style.color = 'var(--success)';
+        confirmIcon.innerHTML = '<i class="fas fa-circle-check"></i>';
+        confirmInput.classList.add('is-valid-field');
+        confirmInput.classList.remove('is-invalid-field');
+      } else {
+        matchHint.textContent = '✗ Passwords do not match';
+        matchHint.className   = 'match-hint no-match';
+        confirmIcon.className = 'input-icon';
+        confirmIcon.style.color = 'var(--emergency)';
+        confirmIcon.innerHTML = '<i class="fas fa-circle-xmark"></i>';
+        confirmInput.classList.add('is-invalid-field');
+        confirmInput.classList.remove('is-valid-field');
+      }
+    }
+
+    // ── Form Submit ──────────────────────────────────
+    registerForm.addEventListener('submit', function (e) {
+      const pw  = passwordInput.value;
+      const cpw = confirmInput.value;
+
+      if (!pw) {
+        e.preventDefault();
+        showToast('Please create a password.', 'error', 3000);
+        shakeField(passwordInput);
+        return;
+      }
+      if (pw.length < 6) {
+        e.preventDefault();
+        showToast('Password must be at least 6 characters.', 'error', 3000);
+        shakeField(passwordInput);
+        return;
+      }
+      if (cpw && pw !== cpw) {
+        e.preventDefault();
+        showToast('Passwords do not match. Please check.', 'error', 3000);
+        shakeField(confirmInput);
+        return;
+      }
+
+      // Show success overlay, then submit naturally
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>Creating Account…</span>';
+      successOverlay.classList.add('visible');
+
+      // Allow form to submit normally after brief animation
+      setTimeout(() => {
+        // The form will have submitted; this is fallback
+      }, 1200);
+    });
+
+    // ── Shake Field Utility ──────────────────────────
+    function shakeField(el) {
+      el.style.animation = 'none';
+      el.offsetHeight; // reflow
+      el.style.animation = 'shakeInput 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97)';
+      setTimeout(() => { el.style.animation = ''; }, 500);
+    }
+
+    // Inject shake keyframe dynamically
+    (function injectShake() {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes shakeInput {
+          0%,100% { transform: translateX(0); }
+          20%      { transform: translateX(-6px); }
+          40%      { transform: translateX(6px); }
+          60%      { transform: translateX(-4px); }
+          80%      { transform: translateX(4px); }
+        }`;
+      document.head.appendChild(style);
+    })();
+
+    // ── Ripple Effect ─────────────────────────────────
+    document.querySelectorAll('.ripple-btn').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        const rect   = btn.getBoundingClientRect();
+        const size   = Math.max(rect.width, rect.height);
+        const x      = e.clientX - rect.left - size / 2;
+        const y      = e.clientY - rect.top  - size / 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.cssText = `width:${size}px; height:${size}px; left:${x}px; top:${y}px;`;
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+      });
+    });
+
+    // ── Keyboard: Enter on step 1 fields → continue ──
+    [nameInput, emailInput].forEach(el => {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); goToStep2(); }
+      });
+    });
+
+    // ── Particle Canvas ──────────────────────────────
+    (function initParticles() {
+      const canvas  = document.getElementById('particles-canvas');
+      const ctx     = canvas.getContext('2d');
+      let particles = [];
+      let W, H;
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', () => { resize(); buildParticles(); });
+
+      const PARTICLE_COLORS = [
+        'rgba(14,165,233,',
+        'rgba(20,184,166,',
+        'rgba(139,92,246,',
+        'rgba(56,189,248,',
+        'rgba(99,102,241,',
+      ];
+
+      function buildParticles() {
+        const count = Math.min(Math.floor((W * H) / 14000), 90);
+        particles   = [];
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x:     Math.random() * W,
+            y:     Math.random() * H,
+            r:     Math.random() * 1.6 + 0.4,
+            dx:    (Math.random() - 0.5) * 0.38,
+            dy:    (Math.random() - 0.5) * 0.38,
+            color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+            alpha: Math.random() * 0.5 + 0.15,
+            pulse: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+      buildParticles();
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Draw connection lines
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx   = particles[i].x - particles[j].x;
+            const dy   = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(14,165,233,${0.06 * (1 - dist / 120)})`;
+              ctx.lineWidth   = 0.7;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw particles
+        particles.forEach(p => {
+          p.pulse += 0.02;
+          const alphaMod = p.alpha + Math.sin(p.pulse) * 0.08;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + Math.min(alphaMod, 0.8) + ')';
+          ctx.fill();
+
+          // Move
+          p.x += p.dx;
+          p.y += p.dy;
+
+          // Bounce
+          if (p.x < 0 || p.x > W) p.dx *= -1;
+          if (p.y < 0 || p.y > H) p.dy *= -1;
+        });
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+  </script>
 </body>
 </html>

@@ -1,61 +1,876 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MediAssist — Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .card { border-radius: 20px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 10px; }
-        .form-control { border-radius: 10px; padding: 12px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MediAssist AI — Intelligent, AI-powered hospital department routing and clinical triage system for modern healthcare." />
+  <meta name="keywords" content="MediAssist, AI Healthcare, Hospital Routing, Clinical Triage, Medical AI, Smart Hospital" />
+  <meta name="author" content="MediAssist AI Platform" />
+  <meta name="theme-color" content="#050d1a" />
+  <meta property="og:title" content="MediAssist AI — Login" />
+  <meta property="og:description" content="AI-Powered Healthcare Routing. Login to begin clinical analysis." />
+  <meta property="og:type" content="website" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>MediAssist AI — Secure Login</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
+  />
+  <!-- Font Awesome 6.4 -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <!-- Google Fonts: Inter + Poppins -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <!-- MediAssist Shared Design System -->
+  <link href="css/mediassist.css" rel="stylesheet" />
+
+  <style>
+    /* ─────────────────────────────────────────
+       Login Page — Additional Inline Styles
+    ───────────────────────────────────────── */
+
+    /* Full-page centering */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* Login Card */
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      padding: 44px 40px 36px;
+      position: relative;
+      overflow: hidden;
+      animation: cardSlideUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes cardSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ── ECG / Heartbeat SVG background inside card ── */
+    .ecg-bg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      opacity: 0.07;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .ecg-path {
+      stroke: url(#ecgGradient);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: ecgDraw 3s ease-in-out 0.8s forwards, ecgPulse 3s ease-in-out 3.8s infinite;
+    }
+
+    @keyframes ecgDraw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes ecgPulse {
+      0%, 100% { opacity: 0.07; }
+      50% { opacity: 0.18; }
+    }
+
+    /* ── Brand Section ── */
+    .brand-section {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-icon-login {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      box-shadow:
+        0 8px 32px rgba(14, 165, 233, 0.45),
+        0 0 0 8px rgba(14, 165, 233, 0.1),
+        0 0 0 16px rgba(14, 165, 233, 0.05);
+      margin-bottom: 18px;
+      animation: heartbeat 2s ease-in-out infinite;
+      position: relative;
+    }
+
+    .brand-icon-login::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 22px;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      animation: ringPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.5; }
+    }
+
+    .login-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.85rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 60%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+
+    .login-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── Trust Pills Row ── */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text-secondary);
+      background: rgba(14, 165, 233, 0.05);
+      border: 1px solid rgba(14, 165, 233, 0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .trust-pill:hover {
+      background: rgba(14, 165, 233, 0.12);
+      border-color: rgba(14, 165, 233, 0.35);
+      color: #0ea5e9;
+      transform: translateY(-1px);
+    }
+
+    /* ── Form divider ── */
+    .form-divider {
+      height: 1px;
+      background: rgba(148, 163, 184, 0.15);
+      margin: 4px 0 24px;
+    }
+
+    /* ── Password wrapper ── */
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 50px !important;
+    }
+
+    .eye-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+      z-index: 2;
+      background: none;
+      border: none;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .eye-toggle:hover {
+      color: #0ea5e9;
+    }
+
+    /* ── Submit button full-width override ── */
+    .btn-login {
+      width: 100%;
+      padding: 14px 28px;
+      font-size: 0.97rem;
+      font-weight: 700;
+      border-radius: 14px;
+      justify-content: center;
+      letter-spacing: 0.03em;
+      margin-top: 4px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+      color: white;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 36px rgba(14, 165, 233, 0.55), 0 4px 12px rgba(0, 0, 0, 0.25);
+      background: linear-gradient(135deg, #38bdf8 0%, #14b8a6 100%);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Spinner inside button */
+    .btn-spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-login.loading .btn-spinner { display: inline-block; }
+    .btn-login.loading .btn-icon { display: none; }
+    .btn-login.loading .btn-label { opacity: 0.8; }
+
+    /* ── Register link ── */
+    .register-link {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: rgba(240, 249, 255, 0.45);
+    }
+
+    .register-link a {
+      color: #38bdf8;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .register-link a:hover {
+      color: #14b8a6;
+      text-decoration: underline;
+    }
+
+    /* ── Ripple ── */
+    .ripple-btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnim 0.65s linear;
+      background-color: rgba(255, 255, 255, 0.28);
+      pointer-events: none;
+    }
+
+    @keyframes rippleAnim {
+      to { transform: scale(5); opacity: 0; }
+    }
+
+    /* ── Footer watermark ── */
+    .card-footer-note {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.7rem;
+      color: rgba(240, 249, 255, 0.22);
+      letter-spacing: 0.03em;
+    }
+
+    .card-footer-note span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 32px 22px 28px;
+      }
+
+      .login-title {
+        font-size: 1.55rem;
+      }
+
+      .brand-icon-login {
+        width: 58px;
+        height: 58px;
+        font-size: 22px;
+      }
+
+      .trust-pill {
+        font-size: 0.67rem;
+        padding: 4px 10px;
+      }
+    }
+
+    /* ── Input autofill override ── */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 100px rgba(14, 165, 233, 0.08) inset !important;
+      -webkit-text-fill-color: #f0f9ff !important;
+      caret-color: #f0f9ff;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* ── Floating label (login-specific padding fix) ── */
+    .float-label-group input {
+      padding-right: 46px;
+    }
+  </style>
 </head>
-<body class="d-flex align-items-center justify-content-center">
-<div class="container" style="max-width: 420px;">
-    <div class="card p-5">
-        <div class="text-center mb-4">
-            <i class="fas fa-hospital-user fa-3x text-primary mb-3"></i>
-            <h2 class="fw-bold">MediAssist</h2>
-            <p class="text-muted">Smart Department Recommendation</p>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       BACKGROUND LAYER
+  ════════════════════════════════════════ -->
+  <div class="med-bg"></div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ═══════════════════════════════════════
+       TOAST NOTIFICATION CONTAINER
+  ════════════════════════════════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ═══════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════ -->
+  <div class="med-content login-wrapper">
+    <div class="login-card glass-card">
+
+      <!-- ECG / heartbeat SVG background -->
+      <svg class="ecg-bg" viewBox="0 0 460 80" preserveAspectRatio="none"
+           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="ecgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#0ea5e9" />
+            <stop offset="50%"  stop-color="#14b8a6" />
+            <stop offset="100%" stop-color="#06b6d4" />
+          </linearGradient>
+        </defs>
+        <!-- ECG waveform: flat → small bump → sharp QRS spike → recovery → flat -->
+        <path class="ecg-path"
+          d="M0,40
+             L30,40
+             L38,40
+             L42,34
+             L46,40
+             L54,40
+             L58,40
+             L62,10
+             L66,70
+             L70,38
+             L76,40
+             L82,40
+             L90,33
+             L94,40
+             L120,40
+             L130,40
+             L134,34
+             L138,40
+             L146,40
+             L150,40
+             L154,10
+             L158,70
+             L162,38
+             L168,40
+             L174,40
+             L182,33
+             L186,40
+             L220,40
+             L226,40
+             L230,34
+             L234,40
+             L242,40
+             L246,40
+             L250,10
+             L254,70
+             L258,38
+             L264,40
+             L270,40
+             L278,33
+             L282,40
+             L320,40
+             L326,40
+             L330,34
+             L334,40
+             L342,40
+             L346,40
+             L350,10
+             L354,70
+             L358,38
+             L364,40
+             L370,40
+             L378,33
+             L382,40
+             L420,40
+             L426,40
+             L430,34
+             L434,40
+             L442,40
+             L446,40
+             L450,10
+             L454,70
+             L458,38
+             L460,40"
+        />
+      </svg>
+
+      <!-- ── BRAND SECTION ── -->
+      <div class="brand-section">
+        <div class="brand-icon-login">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+        <h1 class="login-title">MediAssist AI</h1>
+        <p class="login-subtitle">AI-Powered Healthcare Routing</p>
+      </div>
+
+      <!-- ── TRUST PILLS ── -->
+      <div class="trust-row">
+        <span class="trust-pill">🔒 Secure Login</span>
+        <span class="trust-pill">⚡ Fast Routing</span>
+        <span class="trust-pill">🏥 Hospital Optimized</span>
+      </div>
+
+      <!-- ── DIVIDER ── -->
+      <div class="form-divider"></div>
+
+      <!-- ── LOGIN FORM ── -->
+      <form action="login" method="post" id="loginForm" novalidate>
+
+        <!-- Email Field -->
+        <div class="float-label-group">
+          <input
+            type="email"
+            id="emailInput"
+            name="email"
+            placeholder="email"
+            required
+            autocomplete="email"
+            spellcheck="false"
+          />
+          <label for="emailInput">
+            <i class="fas fa-envelope me-1" style="font-size:0.75rem; opacity:0.6;"></i>
+            Email Address
+          </label>
+          <span class="input-icon">
+            <i class="fas fa-envelope" style="font-size:0.8rem;"></i>
+          </span>
         </div>
 
-        <!-- Error / Success Messages -->
-        <div id="errorMsg" class="alert alert-danger d-none"></div>
-        <div id="successMsg" class="alert alert-success d-none"></div>
+        <!-- Password Field -->
+        <div class="float-label-group password-wrapper">
+          <input
+            type="password"
+            id="passwordInput"
+            name="password"
+            placeholder="password"
+            required
+            autocomplete="current-password"
+          />
+          <label for="passwordInput">
+            <i class="fas fa-lock me-1" style="font-size:0.75rem; opacity:0.6;"></i>
+            Password
+          </label>
+          <button
+            type="button"
+            class="eye-toggle"
+            id="eyeToggle"
+            aria-label="Toggle password visibility"
+            tabindex="-1"
+          >
+            <i class="fas fa-eye" id="eyeIcon"></i>
+          </button>
+        </div>
 
-        <form action="login" method="post">
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Email</label>
-                <input type="email" name="email" class="form-control"
-                       placeholder="Enter your email" required>
-            </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Password</label>
-                <input type="password" name="password" class="form-control"
-                       placeholder="Enter your password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-                <i class="fas fa-sign-in-alt me-2"></i>Login
-            </button>
-        </form>
-        <p class="text-center mt-3 mb-0">
-            New user? <a href="register.html" class="text-primary fw-semibold">Register here</a>
-        </p>
-    </div>
-</div>
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="btn-login ripple-btn"
+          id="loginBtn"
+          aria-label="Begin Clinical Analysis"
+        >
+          <span class="btn-spinner" id="btnSpinner" aria-hidden="true"></span>
+          <i class="fas fa-brain btn-icon" id="btnIcon"></i>
+          <span class="btn-label" id="btnLabel">Begin Clinical Analysis</span>
+        </button>
 
-<script>
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('error') === 'invalid') {
-        document.getElementById('errorMsg').classList.remove('d-none');
-        document.getElementById('errorMsg').textContent = 'Invalid email or password!';
+      </form>
+
+      <!-- ── REGISTER LINK ── -->
+      <div class="register-link">
+        New to MediAssist?&nbsp;
+        <a href="register.html">
+          <i class="fas fa-user-plus" style="font-size:0.75rem;"></i>
+          Create Account
+        </a>
+      </div>
+
+      <!-- ── FOOTER NOTE ── -->
+      <p class="card-footer-note">
+        <span>
+          <i class="fas fa-shield-halved"></i>
+          HIPAA-Compliant &middot; 256-bit Encrypted &middot; MediAssist v2.0
+        </span>
+      </p>
+
+    </div><!-- /.login-card -->
+  </div><!-- /.login-wrapper -->
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════════
+       MediAssist AI — Login Page JavaScript
+       Features: Particles · Ripple · Eye Toggle · Toasts · URL Params
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ─────────────────────────────────────────
+       1. PARTICLE CANVAS — Medical Symbols
+    ───────────────────────────────────────── */
+    (function initParticles() {
+      const canvas  = document.getElementById('particles-canvas');
+      const ctx     = canvas.getContext('2d');
+      const SYMBOLS = ['+', '♥', '✚', '·', '•', '+', '♥'];
+      const COUNT   = 40;
+
+      let W, H, particles = [];
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function createParticle(fromBottom) {
+        const size = random(9, 20);
+        return {
+          x      : random(0, W),
+          y      : fromBottom ? H + size : random(-size, H + size),
+          vy     : -random(0.25, 0.75),      // float upward
+          vx     : random(-0.15, 0.15),      // slight horizontal drift
+          size   : size,
+          opacity: random(0.04, 0.18),
+          symbol : SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+          color  : ['rgba(14,165,233,', 'rgba(20,184,166,', 'rgba(6,182,212,'][
+                     Math.floor(Math.random() * 3)],
+          wobble : random(0, Math.PI * 2),
+          wobbleSpeed: random(0.005, 0.02),
+        };
+      }
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < COUNT; i++) {
+          particles.push(createParticle(false));
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        particles.forEach(p => {
+          p.wobble += p.wobbleSpeed;
+          p.x += p.vx + Math.sin(p.wobble) * 0.12;
+          p.y += p.vy;
+
+          if (p.y < -p.size * 2) {
+            Object.assign(p, createParticle(true));
+          }
+
+          ctx.save();
+          ctx.globalAlpha = p.opacity;
+          ctx.font = `${p.size}px "Inter", sans-serif`;
+          ctx.fillStyle = p.color + p.opacity + ')';
+          ctx.textAlign  = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Very subtle glow for larger symbols
+          if (p.size > 14) {
+            ctx.shadowColor = p.color + '0.6)';
+            ctx.shadowBlur  = 8;
+          }
+
+          ctx.fillText(p.symbol, p.x, p.y);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      initParticles();
+      draw();
+      window.addEventListener('resize', () => {
+        resize();
+        initParticles();
+      });
+    }());
+
+
+    /* ─────────────────────────────────────────
+       2. TOAST NOTIFICATION SYSTEM
+    ───────────────────────────────────────── */
+    /**
+     * showToast(message, type, duration)
+     * @param {string} message  — Toast body text
+     * @param {string} type     — 'error' | 'success' | 'info'
+     * @param {number} duration — Auto-dismiss ms (default 4500)
+     */
+    function showToast(message, type = 'info', duration = 4500) {
+      const container = document.getElementById('toast-container');
+      const icons = {
+        error  : 'fa-circle-xmark',
+        success: 'fa-circle-check',
+        info   : 'fa-circle-info',
+      };
+      const labels = {
+        error  : 'Error',
+        success: 'Success',
+        info   : 'Notice',
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `med-toast toast-${type}`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.innerHTML = `
+        <span class="toast-icon">
+          <i class="fas ${icons[type] || icons.info}"></i>
+        </span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:0.75rem; opacity:0.6; text-transform:uppercase;
+                      letter-spacing:0.06em; margin-bottom:2px;">
+            ${labels[type] || 'Notice'}
+          </div>
+          <div style="line-height:1.35; color:rgba(240,249,255,0.92);">${message}</div>
+        </div>
+        <button onclick="dismissToast(this.closest('.med-toast'))"
+                style="background:none;border:none;color:rgba(240,249,255,0.4);
+                       cursor:pointer;padding:2px 4px;font-size:0.9rem;
+                       flex-shrink:0; transition:color 0.2s ease;"
+                onmouseover="this.style.color='rgba(240,249,255,0.9)'"
+                onmouseout="this.style.color='rgba(240,249,255,0.4)'"
+                aria-label="Dismiss notification">
+          <i class="fas fa-xmark"></i>
+        </button>
+      `;
+
+      container.appendChild(toast);
+
+      // Auto-dismiss
+      const timer = setTimeout(() => dismissToast(toast), duration);
+      toast._dismissTimer = timer;
     }
-    if (params.get('success') === 'registered') {
-        document.getElementById('successMsg').classList.remove('d-none');
-        document.getElementById('successMsg').textContent = 'Registration successful! Please login.';
+
+    function dismissToast(toast) {
+      if (!toast || toast._dismissed) return;
+      toast._dismissed = true;
+      clearTimeout(toast._dismissTimer);
+      toast.classList.add('toast-out');
+      toast.addEventListener('animationend', () => toast.remove(), { once: true });
     }
-</script>
+
+
+    /* ─────────────────────────────────────────
+       3. URL PARAM → TOAST  (preserved logic)
+    ───────────────────────────────────────── */
+    (function handleURLParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.get('error') === 'invalid') {
+        // Slight delay so card animation finishes first
+        setTimeout(() => {
+          showToast(
+            'Invalid email or password. Please try again.',
+            'error',
+            5000
+          );
+        }, 750);
+      }
+
+      if (params.get('success') === 'registered') {
+        setTimeout(() => {
+          showToast(
+            'Account created successfully! You can now log in.',
+            'success',
+            5500
+          );
+        }, 750);
+      }
+    }());
+
+
+    /* ─────────────────────────────────────────
+       4. PASSWORD EYE TOGGLE
+    ───────────────────────────────────────── */
+    (function initEyeToggle() {
+      const passwordInput = document.getElementById('passwordInput');
+      const eyeToggle     = document.getElementById('eyeToggle');
+      const eyeIcon       = document.getElementById('eyeIcon');
+
+      eyeToggle.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.className  = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+        eyeToggle.setAttribute(
+          'aria-label',
+          isPassword ? 'Hide password' : 'Show password'
+        );
+      });
+    }());
+
+
+    /* ─────────────────────────────────────────
+       5. RIPPLE EFFECT ON BUTTON
+    ───────────────────────────────────────── */
+    (function initRipple() {
+      document.querySelectorAll('.ripple-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+          const rect   = this.getBoundingClientRect();
+          const size   = Math.max(rect.width, rect.height) * 1.6;
+          const x      = e.clientX - rect.left - size / 2;
+          const y      = e.clientY - rect.top  - size / 2;
+
+          const ripple = document.createElement('span');
+          ripple.className = 'ripple';
+          ripple.style.cssText = `
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x}px;
+            top: ${y}px;
+          `;
+          this.appendChild(ripple);
+          ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+        });
+      });
+    }());
+
+
+    /* ─────────────────────────────────────────
+       6. FORM SUBMIT — Loading State
+    ───────────────────────────────────────── */
+    (function initFormSubmit() {
+      const form      = document.getElementById('loginForm');
+      const loginBtn  = document.getElementById('loginBtn');
+      const btnLabel  = document.getElementById('btnLabel');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const btnIcon   = document.getElementById('btnIcon');
+
+      form.addEventListener('submit', function (e) {
+        const email    = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+
+        // Basic client-side validation
+        if (!email || !password) {
+          e.preventDefault();
+          showToast('Please fill in both email and password.', 'error');
+          return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          e.preventDefault();
+          showToast('Please enter a valid email address.', 'error');
+          return;
+        }
+
+        // Activate loading state
+        loginBtn.classList.add('loading');
+        loginBtn.disabled = true;
+        btnLabel.textContent = 'Analyzing...';
+        btnSpinner.style.display = 'inline-block';
+        btnIcon.style.display = 'none';
+      });
+    }());
+
+
+    /* ─────────────────────────────────────────
+       7. CARD FADE-IN ON LOAD (guaranteed)
+    ───────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      // Card animation is CSS-driven (cardSlideUp keyframe)
+      // Ensure the card is visible even if animation fails
+      const card = document.querySelector('.login-card');
+      if (card) {
+        // Force repaint
+        card.style.willChange = 'transform, opacity';
+        setTimeout(() => {
+          card.style.willChange = 'auto';
+        }, 900);
+      }
+    });
+
+  </script>
 </body>
 </html>
